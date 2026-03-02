@@ -1,0 +1,26 @@
+body{
+    background-color: black;
+}
+h1{
+    color: white;
+    text-align: center;
+}
+.mainBox{
+    display: flex;
+    gap: 20px;
+
+}
+.box1{
+    margin-left: 20px;
+}
+.box2{
+    margin-right: 20px;
+}
+.box1,.box2{
+    flex: 1;
+    border: 3px white solid;
+    height: 60px;
+}
+
+
+
