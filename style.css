@@ -21,6 +21,26 @@ h1{
     border: 3px white solid;
     height: 60px;
 }
+h2 {
+    color: white;
+    font-family: monospace;
+    font-size: 50px;
+    left: 0;
+    line-height: 200px;
+    margin-top: -100px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 50%;
+    margin-left: 23%;
+    border: 3px white solid;
+}
 
+p{
+    font-family: monospace;
+    font-size: 30px;
+    color: white;
+    text-align: end;
+}
 
 
