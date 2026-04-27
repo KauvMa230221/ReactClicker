@@ -1,57 +1,52 @@
-const express = require('express');
-const app = express();
+const express = require("express");
+const cors = require("cors");
+const { SerialPort } = require("serialport");
+const { ReadlineParser } = require("@serialport/parser-readline");
 
-// Middleware for parsing JSON
+const app = express();
+const PORT = 3001;
+
+app.use(cors());
 app.use(express.json());
 
-let users = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith'}
-];
 
-// GET - Retrieve all users
-app.get('/api/users', (req, res) => {
-  res.json(users);
+const port = new SerialPort({
+  path: "COM3", 
+  baudRate: 115200,
 });
 
-// GET - Retrieve a specific user
-app.get('/api/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).json({ message: 'User not found' });
-  res.json(user);
+const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+
+let latestResult = null;
+
+// Listen for Arduino response
+parser.on("data", (data) => {
+  console.log("Arduino Response:", data);
+  latestResult = data.trim();
 });
 
-// POST - Create a new user
-app.post('/api/users', (req, res) => {
-  const newUser = {
-    id: users.length + 1,
-    name: req.body.name,
-    email: req.body.email
-  };
-  users.push(newUser);
-  res.status(201).json(newUser);
+// Start reaction game
+app.post("/start", (req, res) => {
+  latestResult = null;
+
+  port.write("START\n", (err) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to start Arduino" });
+    }
+
+    res.json({ message: "Game started" });
+  });
 });
 
-// PUT - Update a user completely
-app.put('/api/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).json({ message: 'User not found' });
-
-  user.name = req.body.name;
-  user.email = req.body.email;
-
-  res.json(user);
+// Get latest result
+app.get("/result", (req, res) => {
+  if (latestResult) {
+    res.json({ reactionTime: latestResult });
+  } else {
+    res.json({ reactionTime: null });
+  }
 });
 
-// DELETE - Remove a user
-app.delete('/api/users/:id', (req, res) => {
-  const userIndex = users.findIndex(u => u.id === parseInt(req.params.id));
-  if (userIndex === -1) return res.status(404).json({ message: 'User not found' });
-
-  const deletedUser = users.splice(userIndex, 1);
-  res.json(deletedUser[0]);
-});
-
-app.listen(3000, () => {
-  console.log('REST API server running on port 8080');
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
