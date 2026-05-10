@@ -86,5 +86,3 @@ void loop() {
   while (true) {
   }
 }
-
-// TODO: Create the connection to the Rest-API

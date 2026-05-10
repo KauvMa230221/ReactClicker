@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Pico Score</title>
+  </head>
+  <body>
+
+    <nav>
+      <p onclick="reload()" style="cursor: pointer; user-select: none;">
+        RESTART
+      </p>
+    </nav>
+
+    <h1>ReactClicker</h1>
+
+    <div class="mainBox">
+      <div class="box1"><p id="box1">0</p></div>
+      <div class="box2"><p id="box2">0</p></div>
+    </div>
+
+    <style>
+      body {
+        background-color: black;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+      }
+
+      .mainBox {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .box1,
+      .box2 {
+        flex: 1;
+        border: 3px white solid;
+        height: 120px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 50px;
+        color: white;
+        font-family: monospace;
+      }
+
+      p {
+        font-family: monospace;
+        font-size: 30px;
+        color: white;
+        text-align: end;
+      }
+    </style>
+
+    <script>
+      function reload() {
+        location.reload();
+      }
+
+      async function update() {
+        const res = await fetch("/data");
+        const data = await res.json();
+        console.log("Daten: " + data);
+        
+        document.getElementById("box1").innerText = data.scoreOrange;
+        document.getElementById("box2").innerText = data.scoreRed;
+
+        // Change Backgroundcolor and stop the game:
+        if((data.scoreOrange === 12) || (data.scoreRed === 12)){
+          document.body.style.backgroundColor = "white";
+          clearInterval(interval); // Stop the game by clearing the interval
+        }
+
+        if(data.scoreOrange === 12){
+          document.body.innerHTML = "<h2>Orange🍊 gewinnt</h2>";
+        }
+
+        if(data.scoreRed === 12){
+          document.body.innerHTML = "<h2>Red🍎 gewinnt</h2>";
+        }
+      }
+
+      let interval = setInterval(update, 500); // Keeps the game "alive"
+    </script>
+
+  </body>
+</html>
