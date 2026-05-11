@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReactClicker - Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <button onclick="reload()">RESTART</button>
+    </nav>
+
+    <h1>ReactClicker</h1>
+
+    <div class="mainBox">
+        <div class="box">
+            <h2>Player 1</h2>
+            <div class="score" id="player1">0</div>
+        </div>
+        <div class="box">
+            <h2>Player 2</h2>
+            <div class="score" id="player2">0</div>
+        </div>
+    </div>
+    <script>
+      function reload() {
+        location.reload();
+      }
+
+      async function update() {
+        const res = await fetch("/data");
+        const data = await res.json();
+        console.log("Daten: " + data);
+
+        document.getElementById("box1").innerText = data.scoreOrange;
+        document.getElementById("box2").innerText = data.scoreRed;
+
+        // Change Backgroundcolor and stop the game:
+        if (data.scoreOrange === 12 || data.scoreRed === 12) {
+          document.body.style.backgroundColor = "white";
+          clearInterval(interval); // Stop the game by clearing the interval
+        }
+
+        if (data.scoreOrange === 12) {
+          document.body.innerHTML = "<h2>Orange🍊 gewinnt</h2>";
+        }
+
+        if (data.scoreRed === 12) {
+          document.body.innerHTML = "<h2>Red🍎 gewinnt</h2>";
+        }
+      }
+
+       // Keeps the game "alive":
+      let interval = setInterval(update, 500);
+    </script>
+</body>
+</html>
